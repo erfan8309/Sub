@@ -1,134 +1,74 @@
-{
-  "dns": {
-    "independent_cache": true,
-    "rules": [
-      {
-        "domain": [
-          "dns.google"
-        ],
-        "server": "dns-direct"
-      }
-    ],
-    "servers": [
-      {
-        "address": "https://dns.google/dns-query",
-        "address_resolver": "dns-direct",
-        "strategy": "ipv4_only",
-        "tag": "dns-remote"
-      },
-      {
-        "address": "local",
-        "address_resolver": "dns-local",
-        "detour": "direct",
-        "strategy": "ipv4_only",
-        "tag": "dns-direct"
-      },
-      {
-        "address": "local",
-        "detour": "direct",
-        "tag": "dns-local"
-      },
-      {
-        "address": "rcode://success",
-        "tag": "dns-block"
-      }
-    ]
-  },
-  "inbounds": [
-    {
-      "listen": "127.0.0.1",
-      "listen_port": 6450,
-      "override_address": "8.8.8.8",
-      "override_port": 53,
-      "tag": "dns-in",
-      "type": "direct"
-    },
-    {
-      "domain_strategy": "",
-      "endpoint_independent_nat": true,
-      "inet4_address": [
-        "172.19.0.1/28"
-      ],
-      "mtu": 9000,
-      "sniff": true,
-      "sniff_override_destination": false,
-      "stack": "mixed",
-      "tag": "tun-in",
-      "type": "tun"
-    },
-    {
-      "domain_strategy": "",
-      "listen": "127.0.0.1",
-      "listen_port": 2080,
-      "sniff": true,
-      "sniff_override_destination": false,
-      "tag": "mixed-in",
-      "type": "mixed"
-    }
-  ],
-  "log": {
-    "level": "panic"
-  },
-  "outbounds": [
-    {
-      "local_address": [
-        "172.16.0.2/32",
-        "2606:4700:110:8921:cdc7:4044:85af:2e0d/128"
-      ],
-      "mtu": 1280,
-      "peer_public_key": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
-      "pre_shared_key": "",
-      "private_key": "IFSFDYxUr44nVOySU48QA4hvQ7BTLScFgLEx8OoIwGQ=",
-      "reserved": "34nh",
-      "server": "162.159.192.101",
-      "server_port": 1180,
-      "type": "wireguard",
-      "domain_strategy": "",
-      "tag": "proxy"
-    },
-    {
-      "tag": "direct",
-      "type": "direct"
-    },
-    {
-      "tag": "bypass",
-      "type": "direct"
-    },
-    {
-      "tag": "block",
-      "type": "block"
-    },
-    {
-      "tag": "dns-out",
-      "type": "dns"
-    }
-  ],
-  "route": {
-    "auto_detect_interface": true,
-    "rules": [
-      {
-        "outbound": "dns-out",
-        "port": [
-          53
+{                                                       "route": {                                              "geoip": {                                      "path": "geo-assets\\sagernet-sing-geoip-geoip.db"                                              },                                              "geosite": {                                    "path": "geo-assets\\sagernet-sing-geosite-geosite.db"                                          },                                              "rules": [                                      {                                                       "inbound": "dns-in",                            "outbound": "dns-out"                   },                                              {                                                       "port": 53,                                     "outbound": "dns-out"                   },                                              {                                                       "clash_mode": "Direct",                         "outbound": "direct"                    },                                              {                                                       "clash_mode": "Global",                         "outbound": "select"                    }
+                ],                                              "auto_detect_interface": true,
+                "override_android_vpn": true
+        },
+        "outbounds": [
+                {
+                "type": "selector",
+                "tag": "select",
+                "outbounds": [
+                        "auto",
+                        "IP->Iran, kolandone",
+                        "IP->Main, kolandone"
+                ],
+                "default": "auto"
+                },
+                {
+                "type": "urltest",
+                "tag": "auto",
+                "outbounds": [
+                        "IP->Iran, kolandone",
+                        "IP->Main, kolandone"
+                ],
+                "url": "http://cp.cloudflare.com/",
+                "interval": "10m0s"
+                },
+                {
+                "type": "wireguard",
+                "tag": "IP->Iran, kolandone",
+                "local_address": [
+                        "172.16.0.2/32",
+                        ""
+                ],
+                "private_key": "",
+                "server": "162.159.192.23",
+                "server_port": 987,
+                "peer_public_key": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
+                "reserved": ,
+                "mtu": 1280,
+                "fake_packets": "5-10"
+                },
+                {
+                "type": "wireguard",
+                "tag": "IP->Main, kolandone",
+                "detour": "IP->Iran, kolandone",
+                "local_address": [
+                        "172.16.0.2/32",
+                        ""
+                ],
+                "private_key": "",
+                "server": "162.159.192.23",
+                "server_port": 987,
+                "peer_public_key": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
+                "reserved": ,
+                "mtu": 1280,
+                "fake_packets": "5-10"
+                },
+                {
+                "type": "dns",
+                "tag": "dns-out"
+                },
+                {
+                "type": "direct",
+                "tag": "direct"
+                },
+                {
+                "type": "direct",
+                "tag": "bypass"
+                },
+                {
+                "type": "block",
+                "tag": "block"
+                }
         ]
-      },
-      {
-        "inbound": [
-          "dns-in"
-        ],
-        "outbound": "dns-out"
-      },
-      {
-        "ip_cidr": [
-          "224.0.0.0/3",
-          "ff00::/8"
-        ],
-        "outbound": "block",
-        "source_ip_cidr": [
-          "224.0.0.0/3",
-          "ff00::/8"
-        ]
-      }
-    ]
-  }
-}
+        }

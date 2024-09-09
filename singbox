@@ -119,7 +119,6 @@
       "tag": "block"
     }
   ],
-  "remarks": "💦 BPB - IPv6_2 : 443",
   "routing": {
     "domainStrategy": "IPIfNonMatch",
     "rules": [

@@ -1,0 +1,1 @@
+vless://89b3cbba-e6ac-485a-9481-976a0415eab9@[2a06:98c1:3120::3]:443?path=%2FMb6XsEaRHxBqFnaE%2FMTYyLjE1OS4xOTUuMTA0%3Fed%3D2560&security=tls&encryption=none&alpn=h2,http/1.1&host=vFworkER.PaRadOX3OP7103.WoRKERs.DEV&fp=randomized&type=ws&sni=vFWoRKer.paRADOx3oP7103.wORKErs.DeV#%F0%9F%92%A6+BPB+-+IPv6_2+%3A+443

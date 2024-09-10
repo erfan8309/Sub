@@ -1,176 +1,206 @@
 {
+  "log": {
+    "level": "warn",
+    "output": "box.log",
+    "timestamp": true
+  },
   "dns": {
-    "hosts": {
-      "domain:googleapis.cn": "googleapis.com"
-    },
     "servers": [
-      "1.1.1.1",
       {
-        "address": "223.5.5.5",
-        "domains": [
-          "geosite:cn",
-          "geosite:geolocation-cn"
-        ],
-        "expectIPs": [
-          "geoip:cn"
-        ],
-        "port": 53
+        "tag": "dns-remote",
+        "address": "udp://1.1.1.1",
+        "address_resolver": "dns-direct"
+      },
+      {
+        "tag": "dns-trick-direct",
+        "address": "https://sky.rethinkdns.com/",
+        "detour": "direct-fragment"
+      },
+      {
+        "tag": "dns-direct",
+        "address": "1.1.1.1",
+        "address_resolver": "dns-local",
+        "detour": "direct"
+      },
+      {
+        "tag": "dns-local",
+        "address": "local",
+        "detour": "direct"
+      },
+      {
+        "tag": "dns-block",
+        "address": "rcode://success"
       }
-    ]
+    ],
+    "rules": [
+      {
+        "domain": "cp.cloudflare.com",
+        "server": "dns-remote",
+        "rewrite_ttl": 3000
+      }
+    ],
+    "final": "dns-remote",
+    "static_ips": {
+      "sky.rethinkdns.com": [
+        "188.114.97.3",
+        "188.114.96.3",
+        "2a06:98c1:3121::3",
+        "2a06:98c1:3120::3",
+        "104.17.147.22",
+        "104.17.148.22",
+        "188.114.97.3",
+        "188.114.96.3",
+        "2a06:98c1:3121::3",
+        "2a06:98c1:3120::3"
+      ]
+    },
+    "independent_cache": true
   },
   "inbounds": [
     {
-      "listen": "127.0.0.1",
-      "port": 10808,
-      "protocol": "socks",
-      "settings": {
-        "auth": "noauth",
-        "udp": true,
-        "userLevel": 8
-      },
-      "sniffing": {
-        "destOverride": [
-          "http",
-          "tls"
-        ],
-        "enabled": true,
-        "routeOnly": false
-      },
-      "tag": "socks"
+      "type": "tun",
+      "tag": "tun-in",
+      "mtu": 9000,
+      "inet4_address": "172.19.0.1/28",
+      "auto_route": true,
+      "strict_route": true,
+      "endpoint_independent_nat": true,
+      "stack": "mixed",
+      "sniff": true,
+      "sniff_override_destination": true
     },
     {
+      "type": "mixed",
+      "tag": "mixed-in",
       "listen": "127.0.0.1",
-      "port": 10809,
-      "protocol": "http",
-      "settings": {
-        "userLevel": 8
-      },
-      "tag": "http"
+      "listen_port": 2334,
+      "sniff": true,
+      "sniff_override_destination": true
+    },
+    {
+      "type": "direct",
+      "tag": "dns-in",
+      "listen": "127.0.0.1",
+      "listen_port": 6450
     }
   ],
-  "log": {
-    "loglevel": "warning"
-  },
   "outbounds": [
     {
-      "mux": {
-        "concurrency": -1,
-        "enabled": false,
-        "xudpConcurrency": 8,
-        "xudpProxyUDP443": ""
-      },
-      "protocol": "vless",
-      "settings": {
-        "vnext": [
-          {
-            "address": "2a06:98c1:3120::3",
-            "port": 443,
-            "users": [
-              {
-                "encryption": "none",
-                "flow": "",
-                "id": "89b3cbba-e6ac-485a-9481-976a0415eab9",
-                "level": 8,
-                "security": "auto"
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "allowInsecure": false,
-          "alpn": [
-            "h2",
-            "http/1.1"
-          ],
-          "fingerprint": "randomized",
-          "publicKey": "",
-          "serverName": "vFWoRKer.paRADOx3oP7103.wORKErs.DeV",
-          "shortId": "",
-          "show": false,
-          "spiderX": ""
-        },
-        "wsSettings": {
-          "headers": {
-            "Host": "vFworkER.PaRadOX3OP7103.WoRKERs.DEV"
-          },
-          "path": "/Mb6XsEaRHxBqFnaE/MTYyLjE1OS4xOTUuMTA0?ed=2560"
-        }
-      },
-      "tag": "proxy"
+      "type": "selector",
+      "tag": "select",
+      "outbounds": [
+        "auto",
+        "rastak90-2304 § 0"
+      ],
+      "default": "auto"
     },
     {
-      "protocol": "freedom",
-      "settings": {
-        "domainStrategy": "UseIP"
-      },
+      "type": "urltest",
+      "tag": "auto",
+      "outbounds": [
+        "rastak90-2304 § 0"
+      ],
+      "url": "http://connectivitycheck.gstatic.com/generate_204",
+      "interval": "10m0s",
+      "idle_timeout": "1h40m0s"
+    },
+    {
+      "type": "wireguard",
+      "tag": "rastak90-2304 § 0",
+      "local_address": [
+        "172.16.0.2/24",
+        "2606:4700:110:8491:2467:f52:6171:c87e/128"
+      ],
+      "private_key": "uM06XNabBjX+iQRBoADQC266sx4ZCRMoiF7IzpNLGGU=",
+      "server": "162.159.192.101",
+      "server_port": 1014,
+      "peer_public_key": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
+      "reserved": "xwh2",
+      "mtu": 1330,
+      "fake_packets": "5-10",
+      "fake_packets_size": "40-100",
+      "fake_packets_delay": "20-250"
+    },
+    {
+      "type": "dns",
+      "tag": "dns-out"
+    },
+    {
+      "type": "direct",
       "tag": "direct"
     },
     {
-      "protocol": "blackhole",
-      "settings": {
-        "response": {
-          "type": "http"
-        }
-      },
+      "type": "direct",
+      "tag": "direct-fragment",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "1-500",
+        "sleep": "0-500"
+      }
+    },
+    {
+      "type": "direct",
+      "tag": "bypass"
+    },
+    {
+      "type": "block",
       "tag": "block"
     }
   ],
-  "routing": {
-    "domainStrategy": "IPIfNonMatch",
+  "route": {
     "rules": [
       {
-        "ip": [
-          "1.1.1.1"
+        "rule_set": [
+          "geoip-ir",
+          "geosite-ir"
         ],
-        "outboundTag": "proxy",
-        "port": "53"
+        "outbound": "direct"
       },
       {
-        "ip": [
-          "223.5.5.5"
-        ],
-        "outboundTag": "direct",
-        "port": "53"
+        "inbound": "dns-in",
+        "outbound": "dns-out"
       },
       {
-        "domain": [
-          "domain:googleapis.cn",
-          "domain:gstatic.com"
-        ],
-        "outboundTag": "proxy"
+        "port": 53,
+        "outbound": "dns-out"
       },
       {
-        "ip": [
-          "geoip:private"
-        ],
-        "outboundTag": "direct"
+        "clash_mode": "Direct",
+        "outbound": "direct"
       },
       {
-        "ip": [
-          "geoip:cn"
-        ],
-        "outboundTag": "direct"
-      },
-      {
-        "domain": [
-          "geosite:cn"
-        ],
-        "outboundTag": "direct"
-      },
-      {
-        "domain": [
-          "geosite:geolocation-cn"
-        ],
-        "outboundTag": "direct"
-      },
-      {
-        "outboundTag": "proxy",
-        "port": "0-65535"
+        "clash_mode": "Global",
+        "outbound": "select"
       }
-    ]
+    ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "geoip-ir",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/hiddify/hiddify-geo/rule-set/country/geoip-ir.srs",
+        "update_interval": "120h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "geosite-ir",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/hiddify/hiddify-geo/rule-set/country/geosite-ir.srs",
+        "update_interval": "120h0m0s"
+      }
+    ],
+    "final": "select",
+    "auto_detect_interface": true,
+    "override_android_vpn": true
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true,
+      "path": "clash.db"
+    },
+    "clash_api": {
+      "external_controller": "127.0.0.1:6756",
+      "secret": "mCWTiVL0Bv9_7OFd"
+    }
   }
 }

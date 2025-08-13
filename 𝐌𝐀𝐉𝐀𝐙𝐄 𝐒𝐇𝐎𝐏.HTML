@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MAJAZE SHOP Panel</title>
+  <style>
+    :root{
+      --orange-bg: #ffb84d;
+      --blue-btn: #007bff;
+      --blue-btn-hover: #0056d6;
+      --panel-width: 820px;
+      --font-sans: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    body{
+      margin:0;
+      padding:40px;
+      background: var(--orange-bg);
+      font-family: var(--font-sans);
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      min-height:100vh;
+    }
+    .panel{
+      width:var(--panel-width);
+      background:#fff;
+      border-radius:10px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.18);
+      padding:20px;
+      box-sizing:border-box;
+    }
+    .header{
+      font-size:20px;
+      font-weight:700;
+      text-align:center;
+      margin-bottom:14px;
+    }
+    .subheader{
+      text-align:center;
+      color:#444;
+      margin-bottom:18px;
+    }
+    label{
+      display:block;
+      font-weight:600;
+      margin:10px 0 6px;
+      color:#222;
+      font-size:14px;
+    }
+    select, input[type="text"], .btn, textarea{
+      width:100%;
+      box-sizing:border-box;
+      padding:10px 12px;
+      border-radius:6px;
+      border:1px solid #d0d0d0;
+      font-size:14px;
+      background:#fff;
+      color:#111;
+    }
+    select{ appearance: none; }
+    .row{
+      display:flex;
+      gap:12px;
+    }
+    .col{ flex:1; }
+    .controls{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+    }
+    .btn{
+      background:var(--blue-btn);
+      color:#fff;
+      border:0;
+      padding:10px 14px;
+      font-weight:600;
+      cursor:pointer;
+      border-radius:8px;
+    }
+    .btn.secondary{
+      background:#28a745;
+    }
+    .btn:active{ transform:translateY(1px); }
+    .btn:hover{ background:var(--blue-btn-hover); }
+    textarea{
+      min-height:260px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size:13px;
+      resize:vertical;
+    }
+    .small{
+      font-size:12px;
+      color:#555;
+      margin-top:6px;
+    }
+    footer{ margin-top:10px; text-align:right; color:#666; font-size:13px; }
+  </style>
+</head>
+<body>
+  <div class="panel" role="main" aria-label="MAJAZE Shop Panel">
+    <div class="header">پنل 𝐌𝐀𝐉𝐀𝐙𝐄 𝐒𝐇𝐎𝐏</div>
+    <div class="subheader">WireGuard config generator — All panel texts in English</div>
+
+    <label for="country">Country</label>
+    <select id="country">
+      <option value="ae">United Arab Emirates 🇦🇪</option>
+      <option value="tr">Turkey 🇹🇷</option>
+      <option value="de">Germany 🇩🇪</option>
+      <option value="qa">Qatar 🇶🇦</option>
+    </select>
+
+    <label for="operator">Operator</label>
+    <select id="operator">
+      <option value="1">1 - Irancell</option>
+      <option value="2">2 - Hamrah-e-Aval</option>
+      <option value="3">3 - RighTel</option>
+      <option value="4">4 - Wi-Fi</option>
+      <option value="5">5 - Other</option>
+      <option value="6">6 - All</option>
+    </select>
+
+    <label for="purpose">WireGuard purpose</label>
+    <select id="purpose">
+      <option value="ping_good">Good ping</option>
+      <option value="register_good">Good register</option>
+      <option value="ping_register_excellent">Ping & register excellent</option>
+      <option value="solve_game_login">Solve game login issue</option>
+    </select>
+
+    <label for="confName">Config name (file will be downloaded with this name)</label>
+    <input id="confName" type="text" placeholder="example-client" />
+
+    <div class="controls" style="margin-top:12px;">
+      <button id="createBtn" class="btn">Create Config</button>
+      <button id="downloadBtn" class="btn secondary">Download WireGuard</button>
+      <button id="copyBtn" class="btn" title="Copy to clipboard">Copy</button>
+    </div>
+
+    <div class="small">Note: The first IPv4 address 192.168.122.250/24 is kept fixed. Other addresses in Address field will change on each generation.</div>
+
+    <label for="output" style="margin-top:12px;">Generated WireGuard configuration</label>
+    <textarea id="output" readonly></textarea>
+
+    <footer>Use responsibly.</footer>
+  </div>
+
+  <script>
+    // Static parts from your provided template (kept as-is)
+    const PRIVATE_KEY = "jjliNGbVTN4TBlVVZR4tyqElQspLlNemY7wuzO6ttrw=";
+    const MTU = "1315";
+    const DNS = "10.202.10.10, 78.157.42.100, cadd:5af6:ed03:b8bd:da11:5b87:4524:fe49, bb54:1fa0:3121:655:9fde:e6d8:f9c4:23dd, 7021:5ce3:68f1:42f:c72e:9880:9dc1:faad, 528e:29b6:b05:b02f:3438:e1a9:ba7f:b7fe, 2a32:2fe9:cd2:25ab:db33:1f21:6ce7:306b, eac4:bb05:7f89:8f2d:ca:136f:8bec:289c, d3d:9395:9122:9dcd:b357:b09c:efe2:ca88, b1b:c059:8e57:6e7b:1284:7ff4:c7b2:89c8, 9d1b:9d35:bd8a:a465:296a:5cec:335f:5196, ff5:9999:9db5:9202:8d6e:4392:507c:f8df, 4019:8af7:af7c:38eb:8162:c5f2:9f05:b08e, 1c23:b1b:e1b0:7e00:62d0:bce5:e417:beb, 194e:b41a:c0e1:38a2:544b:7e22:c3:b390, 9c3e:895c:fc78:7439:a3cd:b510:6233:10a4, b0ba:ae1d:907:882a:e9cb:da66:c81e:e081, ef85:d82b:afc2:fa50:d1a3:e720:e283:a7fa, 5b90:8f0e:2172:9927:6d26:c20a:d611:d229, f78e:36a0:fa6b:3478:9714:1046:f76:8f05, 558f:73ee:d057:c231:a104:3cd2:dfb6:4d1d, bffb:10bf:e49c:90d:5431:e16f:20a2:94f3";
+    const PEER_PUBLIC_KEY = "/w+IuEHmq5vZjpj//MKTHuCo4Cow9jAp/ZLrcEHxHAk=";
+    const PRESHARED_KEY = "ayoBNyjFuLkBNL8eFQKyNQ8fwBUqMnc2r0n01+6ytEE=";
+    const ENDPOINT = "225.91.173.30:51820";
+    const KEEPALIVE = "35";
+
+    const fixedIPv4 = "192.168.122.250/24"; // the "top" address to keep fixed
+
+    const outputEl = document.getElementById('output');
+    const createBtn = document.getElementById('createBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const confNameEl = document.getElementById('confName');
+
+    function randHex(len){
+      let s="";
+      const hex="0123456789abcdef";
+      for(let i=0;i<len;i++) s += hex[Math.floor(Math.random()*16)];
+      return s;
+    }
+
+    function genIPv6(){
+      // produce a full uncompressed IPv6 (8 groups) like ab12:34cd:...
+      const parts = [];
+      for(let i=0;i<8;i++){
+        parts.push(randHex(4));
+      }
+      return parts.join(":");
+    }
+
+    function generateAddressList(){
+      // Keep the fixed IPv4 first, then generate many IPv6 addresses (unique)
+      const n = 15 + Math.floor(Math.random()*6); // 15-20 addresses
+      const set = new Set();
+      const arr = [fixedIPv4];
+      while(set.size < n){
+        set.add(genIPv6());
+      }
+      set.forEach(ipv6 => arr.push(ipv6));
+      return arr.join(", ");
+    }
+
+    function buildConfig(){
+      const addressLine = generateAddressList();
+      // Build the config text using the static keys and dynamic Address
+      const cfg = [
+        "[Interface]",
+        `PrivateKey = ${PRIVATE_KEY}`,
+        `Address = ${addressLine}`,
+        `MTU = ${MTU}`,
+        `DNS = ${DNS}`,
+        "",
+        "[Peer]",
+        `PublicKey = ${PEER_PUBLIC_KEY}`,
+        `PresharedKey = ${PRESHARED_KEY}`,
+        `Endpoint = ${ENDPOINT}`,
+        `PersistentKeepalive = ${KEEPALIVE}`,
+        ""
+      ].join("\n");
+      return cfg;
+    }
+
+    createBtn.addEventListener('click', () => {
+      const cfg = buildConfig();
+      outputEl.value = cfg;
+      // auto-select generated for convenience
+      outputEl.scrollTop = 0;
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      let name = (confNameEl.value || "wireguard-config").trim();
+      // sanitize filename
+      name = name.replace(/[\\/:"*?<>|]+/g, "_");
+      const cfgText = outputEl.value || buildConfig();
+      const blob = new Blob([cfgText], {type: "text/plain;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name.endsWith(".conf") ? name : (name + ".conf");
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        a.remove();
+      }, 500);
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      const txt = outputEl.value || buildConfig();
+      try{
+        await navigator.clipboard.writeText(txt);
+        copyBtn.textContent = "Copied!";
+        setTimeout(()=> copyBtn.textContent = "Copy", 1200);
+      }catch(e){
+        // fallback
+        outputEl.select();
+        document.execCommand('copy');
+        copyBtn.textContent = "Copied!";
+        setTimeout(()=> copyBtn.textContent = "Copy", 1200);
+      }
+    });
+
+    // Generate an initial config on load
+    outputEl.value = buildConfig();
+  </script>
+</body>
+</html>

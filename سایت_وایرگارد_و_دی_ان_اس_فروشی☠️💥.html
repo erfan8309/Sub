@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>سایت تولید WireGuard و DNS</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      background-color: orange;
+      text-align: center;
+      direction: rtl;
+      padding: 20px;
+    }
+    h1 {
+      color: #fff;
+      margin-bottom: 30px;
+      font-size: 36px;
+    }
+    .button {
+      display: inline-block;
+      padding: 20px 40px;
+      margin: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .button:hover {
+      transform: scale(1.05);
+    }
+    .wireguard { background-color: #28a745; } /* سبز */
+    .dns { background-color: #ffffff; color: #000; border: 2px solid #ccc; } /* سفید */
+    .dnsvip { background-color: #dc3545; } /* قرمز */
+    .copy { background-color: #007bff; } /* آبی */
+    .save { background-color: #6c757d; } /* خاکستری */
+    .output {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: left;
+      direction: ltr;
+      white-space: pre-wrap;
+      font-size: 20px;
+    }
+    label {
+      font-size: 26px;
+      font-weight: bold;
+      display: block;
+      margin-top: 20px;
+      color: #fff;
+    }
+    select, input[type="text"], input[type="number"] {
+      padding: 15px;
+      font-size: 24px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 80%;
+      max-width: 500px;
+    }
+    .section {
+      display: none;
+    }
+    .active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>سایت تولید WireGuard و DNS</h1>
+
+  <div>
+    <button class="button wireguard" onclick="showSection('wireguardSection')">ساختن WireGuard</button>
+    <button class="button dns" onclick="showSection('dnsSection')">ساختن DNS</button>
+    <button class="button dnsvip" onclick="showSection('dnsvipSection')">ساختن DNS VIP</button>
+  </div>
+
+  <div id="wireguardSection" class="section">
+    <label for="wgType">نوع WireGuard:</label>
+    <select id="wgType">
+      <option value="standard">استاندارد</option>
+      <option value="vip">VIP</option>
+    </select>
+    <br>
+    <button class="button wireguard" onclick="generateWireGuard()">تولید WireGuard</button>
+    <button class="button copy" onclick="copyToClipboard('wireguardOutput')">کپی WireGuard</button>
+    <button class="button save" onclick="saveToFile('wireguardOutput')">ذخیره WireGuard</button>
+    <div id="wireguardOutput" class="output" style="display:none;"></div>
+  </div>
+
+  <div id="dnsSection" class="section">
+    <label for="dnsCountry">کشور:</label>
+    <select id="dnsCountry">
+      <option value="nl">هلند</option>
+      <option value="fr">فرانسه</option>
+      <option value="tr">ترکیه</option>
+    </select>
+    <br>
+    <button class="button dns" onclick="generateDNS()">تولید DNS</button>
+    <button class="button copy" onclick="copyToClipboard('dnsOutput')">کپی DNS</button>
+    <button class="button save" onclick="saveToFile('dnsOutput')">ذخیره DNS</button>
+    <div id="dnsOutput" class="output" style="display:none;"></div>
+  </div>
+
+  <div id="dnsvipSection" class="section">
+    <label for="vipCount">تعداد DNS VIP:</label>
+    <input type="number" id="vipCount" value="2" min="1" max="10">
+    <br>
+    <button class="button dnsvip" onclick="generateDNSVIP()">تولید DNS VIP</button>
+    <button class="button copy" onclick="copyToClipboard('dnsvipOutput')">کپی DNS VIP</button>
+    <button class="button save" onclick="saveToFile('dnsvipOutput')">ذخیره DNS VIP</button>
+    <div id="dnsvipOutput" class="output" style="display:none;"></div>
+  </div>
+
+  <script>
+    function showSection(id) {
+      const sections = ['wireguardSection', 'dnsSection', 'dnsvipSection'];
+      sections.forEach(section => {
+        document.getElementById(section).classList.remove('active');
+      });
+      document.getElementById(id).classList.add('active');
+    }
+
+    function generateWireGuard() {
+      const type = document.getElementById('wgType').value;
+      const endpointPart1 = Math.floor(Math.random() * 256);
+      const endpointPart2 = Math.floor(Math.random() * 256);
+      const config = `[Interface]
+PrivateKey = AIOUaA7f3iBy9NTNYyEWqiFYakrPtTmBdT8cSAIKLb8=
+Address = 185.101.37.19/24
+DNS = 10.202.10.10,78.157.42.100
+MTU = 1483
+
+[Peer]
+PublicKey = ogT+5ectSIxGf3ODMD4mjGA0XShg0+q8H4rYTD4BSYc=
+PresharedKey = mpiJHlhHX2xPmVqx+SWi21g5OEQHKdrsktAz/B5GidI=
+Endpoint = 185.101.${endpointPart1}.${endpointPart2}:41269
+PersistentKeepalive = 47
+نوع: ${type}`;
+      displayOutput('wireguardOutput', config);
+    }
+
+    function generateDNS() {
+      const ip1 = `147.169.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}`;
+      const ip2 = `147.169.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}`;
+      const config = `DNS1: ${ip1}
+DNS2: ${ip2}
+ns1.svou.nl`;
+      displayOutput('dnsOutput', config);
+    }
+
+    function generateDNSVIP() {
+      const count = parseInt(document.getElementById('vipCount').value);
+      let config = '';
+      for (let i = 0; i < count; i++) {
+        const ip = `147.169.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}`;
+        config += `VIP DNS${i + 1}: ${ip}\n`;
+      }
+      config += 'ns1.svou.nl';
+      displayOutput('dnsvipOutput', config);
+    }
+
+    function displayOutput(id, content) {
+      const outputDiv = document.getElementById(id);
+      outputDiv.style.display = 'block';
+      outputDiv.textContent = content;
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('متن کپی شد!');
+      });
+    }
+
+    function saveToFile(id) {
+      const text = document.getElementById(id).textContent;
+      const filename = prompt('نام فایل را وارد کنید:');
+      if (filename) {
+        const blob = new Blob([text], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.download = filename + '.txt';
+        link.href = window.URL.createObjectURL(blob);
+        link.click();
+      }
+    }
+  </script>
+</body>
+</html>
